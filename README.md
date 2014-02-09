@@ -15,7 +15,7 @@ This plugin gives you two CMB field types based on the Select2 script:
 ```php
 array(
 	'name' => 'Cooking time',
-	'id' => $prefix . 'ingredients',
+	'id' => $prefix . 'cooking_time',
 	'desc' => 'Cooking time',
 	'options' => array(
 		'5' => '5 minutes',
