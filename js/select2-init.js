@@ -7,10 +7,10 @@
 	});
 
 	$( '.cmb-type-pw_multiselect .select2' ).each(function() {
-		var instance = $( this ).attr( 'id' ),
-			instance_data = window[ instance + '_data' ];
+		var instance = $( this ),
+			instance_data = window[ instance.attr( 'id' ) + '_data' ];
 
-		$( this ).select2({
+		$( instance ).select2({
 			multiple: true,
 			data: instance_data,
 			initSelection: function( element, callback ) {
@@ -31,10 +31,10 @@
 			}
 		});
 
-		$( this ).select2( 'container' ).find( 'ul.select2-choices' ).sortable({
+		$( instance ).select2( 'container' ).find( 'ul.select2-choices' ).sortable({
 			containment: 'parent',
-			start: function() { $( '.select2' ).select2( 'onSortStart' ); },
-			update: function() { $( '.select2' ).select2( 'onSortEnd' ); }
+			start: function() { $( instance ).select2( 'onSortStart' ); },
+			update: function() { $( instance ).select2( 'onSortEnd' ); }
 		});
 	});
 
