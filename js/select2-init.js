@@ -12,6 +12,7 @@
 
 		$( instance ).select2({
 			multiple: true,
+			escapeMarkup: function ( m ) { return m; },
 			data: instance_data,
 			initSelection: function( element, callback ) {
 				var data = [];

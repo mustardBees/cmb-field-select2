@@ -3,7 +3,7 @@
 Plugin Name: CMB Field Type: Select2
 Plugin URI: https://github.com/mustardBees/cmb-field-select2
 Description: Select2 field type for Custom Metaboxes and Fields for WordPress
-Version: 0.3
+Version: 1.0.0
 Author: Phil Wylie
 Author URI: http://www.philwylie.co.uk/
 License: GPLv2+
@@ -16,9 +16,9 @@ define( 'PW_SELECT2_URL', plugin_dir_url( __FILE__ ) );
  * Enqueue scripts and styles, call requested select box field
  */
 function pw_select2( $field, $meta ) {
-	wp_enqueue_script( 'pw-select2-field-js', PW_SELECT2_URL . 'js/select2/select2.min.js', array( 'jquery-ui-sortable' ), '3.4.5' );
+	wp_enqueue_script( 'pw-select2-field-js', PW_SELECT2_URL . 'js/select2/select2.min.js', array( 'jquery-ui-sortable' ), '3.5.1' );
 	wp_enqueue_script( 'pw-select2-field-init', PW_SELECT2_URL . 'js/select2-init.js', array( 'pw-select2-field-js' ), null );
-	wp_enqueue_style( 'pw-select2-field-css', PW_SELECT2_URL . 'js/select2/select2.css', array(), '3.4.5' );
+	wp_enqueue_style( 'pw-select2-field-css', PW_SELECT2_URL . 'js/select2/select2.css', array(), '3.5.1' );
 	wp_enqueue_style( 'pw-select2-field-mods', PW_SELECT2_URL . 'css/select2.css', array(), null );
 
 	call_user_func( $field['type'], $field, $meta );
@@ -36,10 +36,10 @@ function pw_select( $field, $meta ) {
 	echo '<option></option>';
 	if ( isset( $field['options'] ) && ! empty( $field['options'] ) ) {
 		foreach ( $field['options'] as $option_key => $option ) {
-			$label = isset( $option['name'] ) ? $option['name'] : $option;
-			$value = isset( $option['value'] ) ? $option['value'] : $option_key;
+			$opt_label = is_array( $option ) && array_key_exists( 'name', $option ) ? $option['name'] : $option;
+			$opt_value = is_array( $option ) && array_key_exists( 'value', $option ) ? $option['value'] : $option_key;
 
-			echo '<option value="', $value, '" ', selected( $meta == $value ) ,'>', $label, '</option>';
+			echo '<option value="', $opt_value, '" ', selected( $meta == $opt_value ) ,'>', $opt_label, '</option>';
 		}
 	}
 	echo '</select>';
@@ -53,12 +53,12 @@ function pw_multiselect( $field, $meta ) {
 
 	if ( isset( $field['options'] ) && ! empty( $field['options'] ) ) {
 		foreach ( $field['options'] as $option_key => $option ) {
-			$label = isset( $option['name'] ) ? $option['name'] : $option;
-			$value = isset( $option['value'] ) ? $option['value'] : $option_key;
+			$opt_label = is_array( $option ) && array_key_exists( 'name', $option ) ? $option['name'] : $option;
+			$opt_value = is_array( $option ) && array_key_exists( 'value', $option ) ? $option['value'] : $option_key;
 
 			$options[] = array(
-				'id' => $value,
-				'text' => $label
+				'id' => $opt_value,
+				'text' => $opt_label
 			);
 		}
 	}
@@ -79,7 +79,7 @@ function pw_select2_sanitise( $meta_value, $field ) {
 	if ( empty( $meta_value ) ) {
 		$meta_value = '';
 	} elseif ( 'pw_multiselect' == $field['type'] ) {
-		$meta_value = explode( ',', $meta_value );
+		$meta_value = wp_parse_id_list( $meta_value );
 	}
 
 	return $meta_value;
