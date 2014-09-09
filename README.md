@@ -1,4 +1,4 @@
-# CMB Field Type: Select2
+# CMB Field Type: Select2 [for CMB2]
 
 ## Description
 
