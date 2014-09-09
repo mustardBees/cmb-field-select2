@@ -21,12 +21,13 @@ function pw_select2( $field, $meta ) {
 	wp_enqueue_style( 'pw-select2-field-css', PW_SELECT2_URL . 'js/select2/select2.css', array(), '3.5.1' );
 	wp_enqueue_style( 'pw-select2-field-mods', PW_SELECT2_URL . 'css/select2.css', array(), null );
 
-	call_user_func( $field['type'], $field, $meta );
+	call_user_func( $field->args('type'), $field->args(), $meta );
 
-	echo ( isset( $field['desc'] ) && ! empty( $meta ) ? '<p class="cmb_metabox_description">' . $field['desc'] . '</p>' : '' );
+	$desc = $field->args('desc');
+	echo ( isset( $desc ) && ! empty( $meta ) ? '<p class="cmb_metabox_description">' . $desc . '</p>' : '' );
 }
-add_filter( 'cmb_render_pw_select', 'pw_select2', 10, 2 );
-add_filter( 'cmb_render_pw_multiselect', 'pw_select2', 10, 2 );
+add_filter( 'cmb2_render_pw_select', 'pw_select2', 10, 2 );
+add_filter( 'cmb2_render_pw_multiselect', 'pw_select2', 10, 2 );
 
 /**
  * Render select box field
