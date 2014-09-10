@@ -79,7 +79,7 @@ function pw_select2_sanitise( $meta_value, $field ) {
 	if ( empty( $meta_value ) ) {
 		$meta_value = '';
 	} elseif ( 'pw_multiselect' == $field['type'] ) {
-		$meta_value = wp_parse_id_list( $meta_value );
+		$meta_value = explode( ',', $meta_value );
 	}
 
 	return $meta_value;
