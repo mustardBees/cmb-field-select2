@@ -3,7 +3,7 @@
 Plugin Name: CMB Field Type: Select2
 Plugin URI: https://github.com/mustardBees/cmb-field-select2
 Description: Select2 field type for Custom Metaboxes and Fields for WordPress
-Version: 1.0.1
+Version: 2.0.0
 Author: Phil Wylie
 Author URI: http://www.philwylie.co.uk/
 License: GPLv2+
@@ -21,9 +21,9 @@ function pw_select2( $field, $meta ) {
 	wp_enqueue_style( 'pw-select2-field-css', PW_SELECT2_URL . 'js/select2/select2.css', array(), '3.5.1' );
 	wp_enqueue_style( 'pw-select2-field-mods', PW_SELECT2_URL . 'css/select2.css', array(), null );
 
-	call_user_func( $field->args('type'), $field->args(), $meta );
+	call_user_func( $field->args( 'type' ), $field->args(), $meta );
 
-	$desc = $field->args('desc');
+	$desc = $field->args( 'desc' );
 	echo ( isset( $desc ) && ! empty( $meta ) ? '<p class="cmb2_metabox_description">' . $desc . '</p>' : '' );
 }
 add_filter( 'cmb2_render_pw_select', 'pw_select2', 10, 2 );
