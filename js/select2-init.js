@@ -1,12 +1,12 @@
 (function( $ ) {
 
-	$( '.cmb-type-pw_select .select2' ).each(function() {
+	$( '.cmb-type-pw-select .select2' ).each(function() {
 		$( this ).select2({
 			allowClear: true
 		});
 	});
 
-	$( '.cmb-type-pw_multiselect .select2' ).each(function() {
+	$( '.cmb-type-pw-multiselect .select2' ).each(function() {
 		var instance = $( this ),
 			instance_data = window[ instance.attr( 'id' ) + '_data' ];
 
