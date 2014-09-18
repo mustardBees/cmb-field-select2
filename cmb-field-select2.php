@@ -23,7 +23,8 @@ function pw_select2( $field, $meta ) {
 
 	call_user_func( $field->args( 'type' ), $field->args(), $meta );
 
-	if ( ! empty( $field->args( 'desc' ) ) ) echo '<p class="cmb2-metabox-description">' . $field->args( 'desc' ) . '</p>';
+	$desc = $field->args('desc');
+	echo ( ! empty( $desc ) && ! empty( $meta ) ? '<p class="cmb2-metabox-description">' . $desc . '</p>' : '' );
 }
 add_filter( 'cmb2_render_pw_select', 'pw_select2', 10, 2 );
 add_filter( 'cmb2_render_pw_multiselect', 'pw_select2', 10, 2 );
