@@ -3,7 +3,7 @@
 Plugin Name: CMB Field Type: Select2
 Plugin URI: https://github.com/mustardBees/cmb-field-select2
 Description: Select2 field type for Custom Metaboxes and Fields for WordPress
-Version: 2.0.2
+Version: 2.0.3
 Author: Phil Wylie
 Author URI: http://www.philwylie.co.uk/
 License: GPLv2+
