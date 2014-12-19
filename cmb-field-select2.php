@@ -33,7 +33,8 @@ add_filter( 'cmb2_render_pw_multiselect', 'pw_select2', 10, 2 );
  * Render select box field
  */
 function pw_select( $field, $meta ) {
-	echo '<select name="', $field['id'], '" id="', $field['id'], '" data-placeholder="' . $field['desc'] . '" class="select2">';
+print_r($field);
+	echo '<select name="', $field['_name'], '" id="', $field['id'], '" data-placeholder="' . $field['desc'] . '" class="select2">';
 	echo '<option></option>';
 	if ( isset( $field['options'] ) && ! empty( $field['options'] ) ) {
 		foreach ( $field['options'] as $option_key => $option ) {

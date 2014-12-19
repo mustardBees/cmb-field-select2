@@ -1,5 +1,42 @@
 (function( $ ) {
 
+	/**
+	 * once fully tested these can be consensed / simplified
+	 */
+
+	$('.cmb-add-group-row').on('cmb2_add_group_row_start', function(event,self){	
+		var groupWrap = $(self).closest( '.cmb-repeatable-group' );
+		groupWrap.find('.cmb-type-pw-select .select2').each(function(){
+			$(this).select2("destroy").end();
+		});
+	});
+	
+	$('.cmb-repeatable-group').on('cmb2_add_row', function(event,newRow){
+		
+		var groupWrap = $(newRow).closest( '.cmb-repeatable-group' );
+		groupWrap.find('.cmb-type-pw-select .select2').each(function(){
+			$(this).select2();
+		});
+	});
+	
+	// prior to shift_rows destroy all select2()
+	$('.cmb-repeatable-group').on('cmb2_shift_rows_start',function(event, self){
+		var groupWrap = $(self).closest( '.cmb-repeatable-group' );
+		groupWrap.find('.cmb-type-pw-select .select2').each(function(){
+			$(this).select2("destroy").end();
+		});
+	});
+	
+	// shift_rows complete not reapply select2()
+	$('.cmb-repeatable-group').on('cmb2_shift_rows_complete',function(event, self){
+		//alert('sort complete -- ' + event + ' -- ' + self);
+		var groupWrap = $(self).closest( '.cmb-repeatable-group' );
+		groupWrap.find('.cmb-type-pw-select .select2').each(function(){
+			//console.log('d2');
+			$(this).select2();
+		});
+	});
+
 	$( '.cmb-type-pw-select .select2' ).each(function() {
 		$( this ).select2({
 			allowClear: true
