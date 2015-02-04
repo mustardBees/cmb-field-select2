@@ -36,35 +36,33 @@ require_once 'cmb-field-select2/cmb-field-select2.php';
 `pw_select` - Select box with with typeahead-style search. Example:
 ```php
 array(
-	'name' => 'Cooking time',
-	'id' => $prefix . 'cooking_time',
-	'desc' => 'Cooking time',
+	'name'    => 'Cooking time',
+	'id'      => $prefix . 'cooking_time',
+	'desc'    => 'Cooking time',
+	'type'    => 'pw_select',
 	'options' => array(
-		'5' => '5 minutes',
+		'5'  => '5 minutes',
 		'10' => '10 minutes',
 		'30' => 'Half an hour',
 		'60' => '1 hour',
 	),
-	'type' => 'pw_select',
-	'sanitization_cb' => 'pw_select2_sanitise',
 ),
 ```
 
 `pw_multiselect` - Multi-value select box with drag and drop reordering. Example:
 ```php
 array(
-	'name' => 'Ingredients',
-	'id' => $prefix . 'ingredients',
-	'desc' => 'Select ingredients. Drag to reorder.',
+	'name'    => 'Ingredients',
+	'id'      => $prefix . 'ingredients',
+	'desc'    => 'Select ingredients. Drag to reorder.',
+	'type'    => 'pw_multiselect',
 	'options' => array(
-		'flour' => 'Flour',
-		'salt' => 'Salt',
-		'eggs' => 'Eggs',
-		'milk' => 'Milk',
+		'flour'  => 'Flour',
+		'salt'   => 'Salt',
+		'eggs'   => 'Eggs',
+		'milk'   => 'Milk',
 		'butter' => 'Butter',
 	),
-	'type' => 'pw_multiselect',
-	'sanitization_cb' => 'pw_select2_sanitise',
 ),
 ```
 
