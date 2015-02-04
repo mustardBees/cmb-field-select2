@@ -3,7 +3,7 @@
 Plugin Name: CMB Field Type: Select2
 Plugin URI: https://github.com/mustardBees/cmb-field-select2
 Description: Select2 field type for Custom Metaboxes and Fields for WordPress
-Version: 2.0.3
+Version: 2.0.4
 Author: Phil Wylie
 Author URI: http://www.philwylie.co.uk/
 License: GPLv2+
@@ -11,15 +11,16 @@ License: GPLv2+
 
 // Useful global constants
 define( 'PW_SELECT2_URL', plugin_dir_url( __FILE__ ) );
+define( 'PW_SELECT2_VERSION', '2.0.4' );
 
 /**
  * Enqueue scripts and styles, call requested select box field
  */
 function pw_select2_enqueue() {
 	wp_enqueue_script( 'pw-select2-field-js', PW_SELECT2_URL . 'js/select2/select2.min.js', array( 'jquery-ui-sortable' ), '3.5.1' );
-	wp_enqueue_script( 'pw-select2-field-init', PW_SELECT2_URL . 'js/select2-init.js', array( 'pw-select2-field-js' ), null );
+	wp_enqueue_script( 'pw-select2-field-init', PW_SELECT2_URL . 'js/select2-init.js', array( 'pw-select2-field-js' ), PW_SELECT2_VERSION );
 	wp_enqueue_style( 'pw-select2-field-css', PW_SELECT2_URL . 'js/select2/select2.css', array(), '3.5.1' );
-	wp_enqueue_style( 'pw-select2-field-mods', PW_SELECT2_URL . 'css/select2.css', array(), null );
+	wp_enqueue_style( 'pw-select2-field-mods', PW_SELECT2_URL . 'css/select2.css', array(), PW_SELECT2_VERSION );
 }
 
 /**
