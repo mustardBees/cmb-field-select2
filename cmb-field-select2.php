@@ -27,7 +27,7 @@ if ( ! class_exists( 'CMB_Field_Select2', false ) ) {
 		 */
 		const PW_SELECT2_VERSION = '2.0.4';
 		
-		private function __construct() {
+		function __construct() {
 			$this->PW_SELECT2_URL = plugin_dir_url( __FILE__ );
 			
 			add_filter( 'cmb2_render_pw_select', array( $this, 'pw_select2_render' ), 10, 5 );
@@ -62,7 +62,7 @@ if ( ! class_exists( 'CMB_Field_Select2', false ) ) {
 		 * Render select box field
 		 */
 		public function pw_select2_render( $field, $value, $object_id, $object_type, $field_type_object ) {
-			CMB_Field_Select2::pw_select2_enqueue();
+			$this->pw_select2_enqueue();
 		
 			echo $field_type_object->select( array(
 				'class'   => 'cmb2_select select2',
@@ -119,6 +119,6 @@ if ( ! class_exists( 'CMB_Field_Select2', false ) ) {
 	}
 
 	// Make it so...
-	CMB_Field_Select2::initiate();
+	$cmb_field_select2 = new CMB_Field_Select2();
 
 }
