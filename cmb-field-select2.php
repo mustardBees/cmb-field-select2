@@ -62,7 +62,8 @@ function pw_multiselect_render( $field, $value, $object_id, $object_type, $field
 		'class' => 'select2',
 		// Use description as placeholder
 		'desc'  => $field->args( 'desc' ) && ! empty( $value ) ? $field_type_object->_desc( true ) : '',
-		'data-placeholder' => esc_attr( $field->args( 'description' ) ),
+		'data-placeholder'   => esc_attr( $field->args( 'description' ) ),
+		'data-max-selection' => intval( $field->args( 'max_selection' ) ),
 	) );
 
 }

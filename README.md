@@ -63,6 +63,7 @@ array(
 		'milk'   => 'Milk',
 		'butter' => 'Butter',
 	),
+	'max_selection' => 3,
 ),
 ```
 
