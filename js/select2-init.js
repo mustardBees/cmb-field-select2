@@ -25,6 +25,12 @@
 							id: this,
 							text: text
 						});
+					} else {
+						// If the post title isn't found in the post data, the post has been
+						// trashed or deleted, and should be removed from the metadata
+						var val = element.val().split( ',' );
+						val.splice( val.indexOf( this.valueOf() ), 1 );
+						element.val( val );
 					}
 				});
 
