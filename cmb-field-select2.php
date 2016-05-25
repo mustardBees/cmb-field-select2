@@ -1,87 +1,176 @@
 <?php
 /*
-Plugin Name: CMB Field Type: Select2
+Plugin Name: CMB2 Field Type: Select2
 Plugin URI: https://github.com/mustardBees/cmb-field-select2
 GitHub Plugin URI: https://github.com/mustardBees/cmb-field-select2
-Description: Select2 field type for Custom Metaboxes and Fields for WordPress
-Version: 2.0.4
+Description: Select2 field type for CMB2.
+Version: 2.1.0
 Author: Phil Wylie
-Author URI: http://www.philwylie.co.uk/
+Author URI: https://www.philwylie.co.uk/
 License: GPLv2+
 */
 
-// Useful global constants
-define( 'PW_SELECT2_URL', plugin_dir_url( __FILE__ ) );
-define( 'PW_SELECT2_VERSION', '2.0.4' );
-
 /**
- * Enqueue scripts and styles, call requested select box field
+ * Class PW_CMB2_Field_Select2
  */
-function pw_select2_enqueue() {
-	wp_enqueue_script( 'pw-select2-field-js', PW_SELECT2_URL . 'js/select2/select2.min.js', array( 'jquery-ui-sortable' ), '3.5.1' );
-	wp_enqueue_script( 'pw-select2-field-init', PW_SELECT2_URL . 'js/select2-init.js', array( 'pw-select2-field-js' ), PW_SELECT2_VERSION );
-	wp_enqueue_style( 'pw-select2-field-css', PW_SELECT2_URL . 'js/select2/select2.css', array(), '3.5.1' );
-	wp_enqueue_style( 'pw-select2-field-mods', PW_SELECT2_URL . 'css/select2.css', array(), PW_SELECT2_VERSION );
-}
+class PW_CMB2_Field_Select2 {
 
-/**
- * Render select box field
- */
-function pw_select2_render( $field, $value, $object_id, $object_type, $field_type_object ) {
-	pw_select2_enqueue();
+	/**
+	 * Current version number
+	 */
+	const VERSION = '2.1.0';
 
-	echo $field_type_object->select( array(
-		'class'   => 'cmb2_select select2',
-		// Append an empty option (used by the placeholder)
-		'options' => '<option></option>' . $field_type_object->concat_items(),
-		// Use description as placeholder
-		'desc'    => $field->args( 'desc' ) && ! empty( $value ) ? $field_type_object->_desc( true ) : '',
-		'data-placeholder' => $field->args( 'desc' ),
-	) );
-}
-add_filter( 'cmb2_render_pw_select', 'pw_select2_render', 10, 5 );
-
-/**
- * Render multi-value select input field
- */
-function pw_multiselect_render( $field, $value, $object_id, $object_type, $field_type_object ) {
-	pw_select2_enqueue();
-
-	$options = array();
-
-	foreach ( (array) $field->options() as $opt_value => $opt_label ) {
-		$options[] = array(
-			'id' => $opt_value,
-			'text' => $opt_label
-		);
+	/**
+	 * Initialize the plugin by hooking into CMB2
+	 */
+	public function __construct() {
+		add_filter( 'cmb2_render_pw_select', array( $this, 'render_pw_select' ), 10, 5 );
+		add_filter( 'cmb2_render_pw_multiselect', array( $this, 'render_pw_multiselect' ), 10, 5 );
+		add_filter( 'cmb2_sanitize_pw_multiselect', array( $this, 'pw_multiselect_sanitize' ), 10, 4 );
+		add_filter( 'cmb2_types_esc_pw_multiselect', array( $this, 'pw_multiselect_escaped_value' ), 10, 3 );
+		add_filter( 'cmb2_repeat_table_row_types', array( $this, 'pw_multiselect_table_row_class' ), 10, 1 );
 	}
 
-	wp_localize_script( 'pw-select2-field-init', $field_type_object->_id() . '_data', $options );
+	/**
+	 * Render select box field
+	 */
+	public function render_pw_select( $field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object ) {
+		$this->setup_admin_scripts();
 
-	echo $field_type_object->input( array(
-		'type'  => 'hidden',
-		'class' => 'select2',
-		// Use description as placeholder
-		'desc'  => $field->args( 'desc' ) && ! empty( $value ) ? $field_type_object->_desc( true ) : '',
-		'data-placeholder' => esc_attr( $field->args( 'description' ) ),
-	) );
-
-}
-add_filter( 'cmb2_render_pw_multiselect', 'pw_multiselect_render', 10, 5 );
-
-
-function pw_multiselect_escape( $check, $meta_value ) {
-	return ! empty( $meta_value ) ? implode( ',', $meta_value ) : $check;
-}
-add_filter( 'cmb2_types_esc_pw_multiselect', 'pw_multiselect_escape', 10, 2 );
-
-
-function pw_multiselect_sanitize( $check, $meta_value ) {
-
-	if ( ! empty( $meta_value ) ) {
-		return explode( ',', $meta_value );
+		echo $field_type_object->select( array(
+			'class'            => 'pw_select2 pw_select',
+			'desc'             => $field_type_object->_desc( true ),
+			'options'          => '<option></option>' . $field_type_object->concat_items(),
+			'data-placeholder' => $field->args( 'attributes', 'placeholder' ) ? $field->args( 'attributes', 'placeholder' ) : $field->args( 'description' ),
+		) );
 	}
 
-	return $check;
+	/**
+	 * Render multi-value select input field
+	 */
+	public function render_pw_multiselect( $field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object ) {
+		$this->setup_admin_scripts();
+
+		$a = $field_type_object->parse_args( array(), 'pw_multiselect', array(
+			'multiple'    => 'multiple',
+			'style'       => 'width: 99%',
+			'class'       => 'pw_select2 pw_multiselect',
+			'name'        => $field_type_object->_name() . '[]',
+			'id'          => $field_type_object->_id(),
+			'desc'        => $field_type_object->_desc( true ),
+			'options'     => $this->get_pw_multiselect_options( $field_escaped_value, $field_type_object ),
+			'data-placeholder' => $field->args( 'attributes', 'placeholder' ) ? $field->args( 'attributes', 'placeholder' ) : $field->args( 'description' ),
+		) );
+
+		$attrs = $field_type_object->concat_attrs( $a, array( 'desc', 'options' ) );
+		echo sprintf( '<select%s>%s</select>%s', $attrs, $a['options'], $a['desc'] );
+	}
+
+	/**
+	 * Return list of options for pw_multiselect
+	 *
+	 * Return the list of options, with selected options at the top preserving their order. This also handles the
+	 * removal of selected options which no longer exist in the options array.
+	 */
+	public function get_pw_multiselect_options( $field_escaped_value = array(), $field_type_object ) {
+		$options = (array) $field_type_object->field->options();
+
+		// If we have selected items, we need to preserve their order
+		if ( ! empty( $field_escaped_value ) ) {
+			$options = $this->sort_array_by_array( $options, $field_escaped_value );
+		}
+
+		$selected_items = '';
+		$other_items = '';
+
+		foreach ( $options as $option_value => $option_label ) {
+
+			// Clone args & modify for just this item
+			$option = array(
+				'value' => $option_value,
+				'label' => $option_label,
+			);
+
+			// Split options into those which are selected and the rest
+			if ( in_array( $option_value, (array) $field_escaped_value ) ) {
+				$option['checked'] = true;
+				$selected_items .= $field_type_object->select_option( $option );
+			} else {
+				$other_items .= $field_type_object->select_option( $option );
+			}
+		}
+
+		return $selected_items . $other_items;
+	}
+
+	/**
+	 * Sort an array by the keys of another array
+	 *
+	 * @author Eran Galperin
+	 * @link http://link.from.pw/1Waji4l
+	 */
+	public function sort_array_by_array( array $array, array $orderArray ) {
+		$ordered = array();
+
+		foreach ( $orderArray as $key ) {
+			if ( array_key_exists( $key, $array ) ) {
+				$ordered[ $key ] = $array[ $key ];
+				unset( $array[ $key ] );
+			}
+		}
+
+		return $ordered + $array;
+	}
+
+	/**
+	 * Handle sanitization for repeatable fields
+	 */
+	function pw_multiselect_sanitize( $check, $meta_value, $object_id, $field_args ) {
+		if ( ! is_array( $meta_value ) || ! $field_args['repeatable'] ) {
+			return $check;
+		}
+
+		foreach ( $meta_value as $key => $val ) {
+			$meta_value[$key] = array_map( 'sanitize_text_field', $val );
+		}
+
+		return $meta_value;
+	}
+
+	/**
+	 * Handle escaping for repeatable fields
+	 */
+	public function pw_multiselect_escaped_value( $check, $meta_value, $field_args ) {
+		if ( ! is_array( $meta_value ) || ! $field_args['repeatable'] ) {
+			return $check;
+		}
+
+		foreach ( $meta_value as $key => $val ) {
+			$meta_value[$key] = array_map( 'esc_attr', $val );
+		}
+
+		return $meta_value;
+	}
+
+	/**
+	 * Add 'table-layout' class to multi-value select field
+	 */
+	public function pw_multiselect_table_row_class( $check ) {
+		$check[] = 'pw_multiselect';
+
+		return $check;
+	}
+
+	/**
+	 * Enqueue scripts and styles
+	 */
+	public function setup_admin_scripts() {
+		$asset_path = apply_filters( 'pw_cmb2_field_select2_asset_path', plugins_url( '', __FILE__  ) );
+
+		wp_register_script( 'pw-select2', $asset_path . '/js/select2.min.js', array( 'jquery-ui-sortable' ), '4.0.2' );
+		wp_enqueue_script( 'pw-select2-init', $asset_path . '/js/script.js', array( 'cmb2-scripts', 'pw-select2' ), self::VERSION );
+		wp_register_style( 'pw-select2', $asset_path . '/css/select2.min.css', array(), '4.0.2' );
+		wp_enqueue_style( 'pw-select2-tweaks', $asset_path . '/css/style.css', array( 'pw-select2' ), self::VERSION );
+	}
 }
-add_filter( 'cmb2_sanitize_pw_multiselect', 'pw_multiselect_sanitize', 10, 2 );
+$pw_cmb2_field_select2 = new PW_CMB2_Field_Select2();

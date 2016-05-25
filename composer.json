@@ -1,6 +1,14 @@
 {
     "name": "mustardBees/cmb-field-select2",
+    "description": "Select2 field type for CMB2",
+    "license": "GPL-2.0+",
     "type": "wordpress-plugin",
-    "description": "Select2 field type for Custom Metaboxes and Fields for WordPress",
-    "homepage": "https://github.com/mustardBees/cmb-field-select2"
+    "keywords": ["wordpress", "plugin"],
+    "homepage": "https://github.com/mustardBees/cmb-field-select2",
+    "authors": [
+        {
+            "name": "Phil Wylie",
+            "homepage": "http://www.philwylie.co.uk/"
+        }
+    ]
 }
