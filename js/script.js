@@ -13,7 +13,7 @@
 			$(select).select2();
 			var ul = $(select).next('.select2-container').first('ul.select2-selection__rendered');
 			ul.sortable({
-				containment: "parent",
+				containment: 'parent',
 				items      : 'li:not(.select2-search--inline)',
 				tolerance  : 'pointer',
 				stop       : function () {
