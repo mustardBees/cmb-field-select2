@@ -1,4 +1,4 @@
-# CMB Field Type: Select2
+# CMB2 Field Type: Select2
 
 ## Description
 
@@ -62,7 +62,7 @@ You can specify placeholder text through the attributes array. Example:
 $cmb->add_field( array(
 	'name'    => 'Ingredients',
 	'id'      => $prefix . 'ingredients',
-	'desc'    => 'Select this recipes ingredients ingredients.',
+	'desc'    => 'Select this recipes ingredients.',
 	'type'    => 'pw_multiselect',
 	'options' => array(
 		'flour'  => 'Flour',
