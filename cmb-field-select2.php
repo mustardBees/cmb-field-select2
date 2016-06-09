@@ -125,7 +125,7 @@ class PW_CMB2_Field_Select2 {
 	/**
 	 * Handle sanitization for repeatable fields
 	 */
-	function pw_multiselect_sanitize( $check, $meta_value, $object_id, $field_args ) {
+	public function pw_multiselect_sanitize( $check, $meta_value, $object_id, $field_args ) {
 		if ( ! is_array( $meta_value ) || ! $field_args['repeatable'] ) {
 			return $check;
 		}
