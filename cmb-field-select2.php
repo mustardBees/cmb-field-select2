@@ -52,13 +52,13 @@ class PW_CMB2_Field_Select2 {
 		$this->setup_admin_scripts();
 
 		$a = $field_type_object->parse_args( array(), 'pw_multiselect', array(
-			'multiple'    => 'multiple',
-			'style'       => 'width: 99%',
-			'class'       => 'pw_select2 pw_multiselect',
-			'name'        => $field_type_object->_name() . '[]',
-			'id'          => $field_type_object->_id(),
-			'desc'        => $field_type_object->_desc( true ),
-			'options'     => $this->get_pw_multiselect_options( $field_escaped_value, $field_type_object ),
+			'multiple'         => 'multiple',
+			'style'            => 'width: 99%',
+			'class'            => 'pw_select2 pw_multiselect',
+			'name'             => $field_type_object->_name() . '[]',
+			'id'               => $field_type_object->_id(),
+			'desc'             => $field_type_object->_desc( true ),
+			'options'          => $this->get_pw_multiselect_options( $field_escaped_value, $field_type_object ),
 			'data-placeholder' => $field->args( 'attributes', 'placeholder' ) ? $field->args( 'attributes', 'placeholder' ) : $field->args( 'description' ),
 		) );
 
