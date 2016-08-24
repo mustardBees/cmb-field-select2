@@ -55,6 +55,10 @@ class PW_CMB2_Field_Select2 {
 	public function render_pw_multiselect( $field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object ) {
 		$this->setup_admin_scripts();
 
+		if ( version_compare( CMB2_VERSION, '2.2.2', '>=' ) ) {
+			$field_type_object->type = new CMB2_Type_Select( $field_type_object );
+		}
+
 		$a = $field_type_object->parse_args( array(), 'pw_multiselect', array(
 			'multiple'         => 'multiple',
 			'style'            => 'width: 99%',
