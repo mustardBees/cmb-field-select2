@@ -59,7 +59,7 @@ class PW_CMB2_Field_Select2 {
 			$field_type_object->type = new CMB2_Type_Select( $field_type_object );
 		}
 
-		$a = $field_type_object->parse_args( array(), 'pw_multiselect', array(
+		$a = $field_type_object->parse_args( 'pw_multiselect', array(
 			'multiple'         => 'multiple',
 			'style'            => 'width: 99%',
 			'class'            => 'pw_select2 pw_multiselect',
