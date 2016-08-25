@@ -4,7 +4,7 @@ Plugin Name: CMB2 Field Type: Select2
 Plugin URI: https://github.com/mustardBees/cmb-field-select2
 GitHub Plugin URI: https://github.com/mustardBees/cmb-field-select2
 Description: Select2 field type for CMB2.
-Version: 3.0.2
+Version: 3.0.3
 Author: Phil Wylie
 Author URI: https://www.philwylie.co.uk/
 License: GPLv2+
@@ -18,7 +18,7 @@ class PW_CMB2_Field_Select2 {
 	/**
 	 * Current version number
 	 */
-	const VERSION = '3.0.2';
+	const VERSION = '3.0.3';
 
 	/**
 	 * Initialize the plugin by hooking into CMB2
@@ -175,9 +175,9 @@ class PW_CMB2_Field_Select2 {
 	public function setup_admin_scripts() {
 		$asset_path = apply_filters( 'pw_cmb2_field_select2_asset_path', plugins_url( '', __FILE__  ) );
 
-		wp_register_script( 'pw-select2', $asset_path . '/js/select2.min.js', array( 'jquery-ui-sortable' ), '4.0.2' );
+		wp_register_script( 'pw-select2', $asset_path . '/js/select2.min.js', array( 'jquery-ui-sortable' ), '4.0.3' );
 		wp_enqueue_script( 'pw-select2-init', $asset_path . '/js/script.js', array( 'cmb2-scripts', 'pw-select2' ), self::VERSION );
-		wp_register_style( 'pw-select2', $asset_path . '/css/select2.min.css', array(), '4.0.2' );
+		wp_register_style( 'pw-select2', $asset_path . '/css/select2.min.css', array(), '4.0.3' );
 		wp_enqueue_style( 'pw-select2-tweaks', $asset_path . '/css/style.css', array( 'pw-select2' ), self::VERSION );
 	}
 }
