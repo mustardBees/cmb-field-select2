@@ -26,9 +26,12 @@ class PW_CMB2_Field_Select2 {
 	public function __construct() {
 		add_filter( 'cmb2_render_pw_select', array( $this, 'render_pw_select' ), 10, 5 );
 		add_filter( 'cmb2_render_pw_multiselect', array( $this, 'render_pw_multiselect' ), 10, 5 );
+		add_filter( 'cmb2_render_pw_multiselect_taxonomy', array( $this, 'render_pw_multiselect_taxonomy' ), 10, 5 );
 		add_filter( 'cmb2_sanitize_pw_multiselect', array( $this, 'pw_multiselect_sanitize' ), 10, 4 );
+		add_filter( 'cmb2_sanitize_pw_multiselect_taxonomy', array( $this, 'pw_multiselect_taxonomy_sanitize' ), 10, 5 );
 		add_filter( 'cmb2_types_esc_pw_multiselect', array( $this, 'pw_multiselect_escaped_value' ), 10, 3 );
 		add_filter( 'cmb2_repeat_table_row_types', array( $this, 'pw_multiselect_table_row_class' ), 10, 1 );
+		add_filter( 'cmb2_non_repeatable_fields', array( $this, 'non_repeatable_multiselect_taxonomy' ), 10, 1 );
 	}
 
 	/**
@@ -67,6 +70,34 @@ class PW_CMB2_Field_Select2 {
 			'id'               => $field_type_object->_id(),
 			'desc'             => $field_type_object->_desc( true ),
 			'options'          => $this->get_pw_multiselect_options( $field_escaped_value, $field_type_object ),
+			'data-placeholder' => $field->args( 'attributes', 'placeholder' ) ? $field->args( 'attributes', 'placeholder' ) : $field->args( 'description' ),
+		) );
+
+		$attrs = $field_type_object->concat_attrs( $a, array( 'desc', 'options' ) );
+		echo sprintf( '<select%s>%s</select>%s', $attrs, $a['options'], $a['desc'] );
+	}
+
+	/**
+	 * Render multi-value select input field
+	 */
+	public function render_pw_multiselect_taxonomy( $field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object ) {
+		$this->setup_admin_scripts();
+
+		if ( version_compare( CMB2_VERSION, '2.2.2', '>=' ) ) {
+			$field_type_object->type = new CMB2_Type_Taxonomy_Select( $field_type_object );
+		}
+
+		$all_terms    = $field_type_object->type->get_terms();
+		$object_terms = $field_type_object->type->get_object_terms();
+
+		$a = $field_type_object->parse_args( 'pw_multiselect_taxonomy', array(
+			'multiple'         => 'multiple',
+			'style'            => 'width: 99%',
+			'class'            => 'pw_select2 pw_multiselect',
+			'name'             => $field_type_object->_name() . '[]',
+			'id'               => $field_type_object->_id(),
+			'desc'             => $field_type_object->_desc( true ),
+			'options'          => $this->get_pw_multiselect_taxonomy_options( $object_terms, $all_terms, $field_type_object ),
 			'data-placeholder' => $field->args( 'attributes', 'placeholder' ) ? $field->args( 'attributes', 'placeholder' ) : $field->args( 'description' ),
 		) );
 
@@ -131,6 +162,39 @@ class PW_CMB2_Field_Select2 {
 	}
 
 	/**
+	 * Return list of options for pw_multiselect_taxonomy
+	 *
+	 * Return the list of options, with selected options at the top preserving their order. This also handles the
+	 * removal of selected options which no longer exist in the options array.
+	 */
+	public function get_pw_multiselect_taxonomy_options( $object_terms, $all_terms, $field_type_object ) {
+		$options  = '';
+		$selected = array();
+
+		foreach ( $object_terms as $term ) {
+			$selected[ $term->slug ] = $term->name;
+
+			$options .= $field_type_object->select_option( array(
+				'label'   => $term->name,
+				'value'   => $term->slug,
+				'checked' => true,
+			) );
+		}
+
+		foreach ( $all_terms as $term ) {
+			if ( ! array_key_exists( $selected[ $term->slug] ) ) {
+				$options .= $field_type_object->select_option( array(
+					'label'   => $term->name,
+					'value'   => $term->slug,
+					'checked' => false,
+				) );
+			}
+		}
+
+		return $options;
+	}
+
+	/**
 	 * Handle sanitization for repeatable fields
 	 */
 	public function pw_multiselect_sanitize( $check, $meta_value, $object_id, $field_args ) {
@@ -143,6 +207,23 @@ class PW_CMB2_Field_Select2 {
 		}
 
 		return $meta_value;
+	}
+
+	/**
+	 * Handle sanitization for taxonomy multiselet
+	 *
+	 * @param bool|mixed $override_value Sanitization/Validation override value to return.
+	 *                                   Default: null. false to skip it.
+	 * @param mixed      $value      The value to be saved to this field.
+	 * @param int        $object_id  The ID of the object where the value will be saved
+	 * @param array      $field_args The current field's arguments
+	 * @param object     $sanitizer  This `CMB2_Sanitize` object
+	 *
+	 * @return string
+	 */
+	public function pw_multiselect_taxonomy_sanitize( $override_value, $value, $object_id, $field_args, $sanitizer ) {
+		wp_set_object_terms( $object_id, $value, $field_args['taxonomy'] );
+		return '';
 	}
 
 	/**
@@ -179,6 +260,18 @@ class PW_CMB2_Field_Select2 {
 		wp_enqueue_script( 'pw-select2-init', $asset_path . '/js/script.js', array( 'cmb2-scripts', 'pw-select2' ), self::VERSION );
 		wp_register_style( 'pw-select2', $asset_path . '/css/select2.min.css', array(), '4.0.3' );
 		wp_enqueue_style( 'pw-select2-tweaks', $asset_path . '/css/style.css', array( 'pw-select2' ), self::VERSION );
+	}
+
+	/**
+	 * Added pw_multiselect_taxonomy to list of non reapeatable fields
+	 *
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	public function non_repeatable_multiselect_taxonomy( $fields ) {
+		$fields['pw_multiselect_taxonomy'] = 1;
+		return $fields;
 	}
 }
 $pw_cmb2_field_select2 = new PW_CMB2_Field_Select2();
