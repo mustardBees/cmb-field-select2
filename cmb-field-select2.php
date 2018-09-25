@@ -78,17 +78,31 @@ class PW_CMB2_Field_Select2 {
 	}
 
 	/**
-	 * Render multi-value select input field
+	 * Render multi-value select input field for taxonomies
+	 *
+	 * @param array  $field              The passed in `CMB2_Field` object
+	 * @param mixed  $escaped_value      The value of this field escaped.
+	 *                                   It defaults to `sanitize_text_field`.
+	 *                                   If you need the unescaped value, you can access it
+	 *                                   via `$field->value()`
+	 * @param int    $object_id          The ID of the current object
+	 * @param string $object_type        The type of object you are working with.
+	 *                                   Most commonly, `post` (this applies to all post-types),
+	 *                                   but could also be `comment`, `user` or `options-page`.
+	 * @param object $field_type_object  This `CMB2_Types` object
+	 *
+	 * @return void
 	 */
-	public function render_pw_multiselect_taxonomy( $field, $field_escaped_value, $field_object_id, $field_object_type, $field_type_object ) {
+	public function render_pw_multiselect_taxonomy( $field, $escaped_value, $object_id, $object_type, $field_type_object ) {
 		$this->setup_admin_scripts();
 
-		if ( version_compare( CMB2_VERSION, '2.2.2', '>=' ) ) {
-			$field_type_object->type = new CMB2_Type_Taxonomy_Select( $field_type_object );
+		if ( version_compare( CMB2_VERSION, '2.2.2', '<' ) || ! class_exists( 'CMB2_Type_Taxonomy_Select' ) ) {
+			return;
 		}
 
-		$all_terms    = $field_type_object->type->get_terms();
-		$object_terms = $field_type_object->type->get_object_terms();
+		$field_type_object->type = new CMB2_Type_Taxonomy_Select( $field_type_object );
+		$all_terms               = $field_type_object->type->get_terms();
+		$object_terms            = $field_type_object->type->get_object_terms();
 
 		$a = $field_type_object->parse_args( 'pw_multiselect_taxonomy', array(
 			'multiple'         => 'multiple',
@@ -102,6 +116,7 @@ class PW_CMB2_Field_Select2 {
 		) );
 
 		$attrs = $field_type_object->concat_attrs( $a, array( 'desc', 'options' ) );
+
 		echo sprintf( '<select%s>%s</select>%s', $attrs, $a['options'], $a['desc'] );
 	}
 
@@ -164,8 +179,14 @@ class PW_CMB2_Field_Select2 {
 	/**
 	 * Return list of options for pw_multiselect_taxonomy
 	 *
-	 * Return the list of options, with selected options at the top preserving their order. This also handles the
-	 * removal of selected options which no longer exist in the options array.
+	 * Return the list of options, with selected options at the top. Ordering of selected terms is not handled
+	 * as this would require setting some kind of term meta value, which is a little out of scope at the moment.
+	 *
+	 * @param array $object_terms
+	 * @param array $all_terms
+	 * @param CMB2_Types $field_type_object
+	 *
+	 * @return array
 	 */
 	public function get_pw_multiselect_taxonomy_options( $object_terms, $all_terms, $field_type_object ) {
 		$options  = '';
@@ -210,7 +231,7 @@ class PW_CMB2_Field_Select2 {
 	}
 
 	/**
-	 * Handle sanitization for taxonomy multiselet
+	 * Handle sanitization and save for taxonomy multiselet.
 	 *
 	 * @param bool|mixed $override_value Sanitization/Validation override value to return.
 	 *                                   Default: null. false to skip it.
@@ -219,7 +240,7 @@ class PW_CMB2_Field_Select2 {
 	 * @param array      $field_args The current field's arguments
 	 * @param object     $sanitizer  This `CMB2_Sanitize` object
 	 *
-	 * @return string
+	 * @return string    Returns an empty string to shortcut the CMB2 and not save the data to a meta field.
 	 */
 	public function pw_multiselect_taxonomy_sanitize( $override_value, $value, $object_id, $field_args, $sanitizer ) {
 		wp_set_object_terms( $object_id, $value, $field_args['taxonomy'] );
