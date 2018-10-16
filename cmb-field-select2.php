@@ -243,7 +243,10 @@ class PW_CMB2_Field_Select2 {
 	 * @return string    Returns an empty string to shortcut CMB2 and not save the data to a meta field.
 	 */
 	public function pw_multiselect_taxonomy_sanitize( $override_value, $value, $object_id, $field_args, $sanitizer ) {
-		wp_set_object_terms( $object_id, $value, $field_args['taxonomy'] );
+		if ( $sanitizer->field->should_show() ) {
+			wp_set_object_terms( $object_id, $value, $field_args['taxonomy'] );
+		}
+
 		return '';
 	}
 
