@@ -9,6 +9,7 @@ Author: Phil Wylie
 Author URI: https://www.philwylie.co.uk/
 License: GPLv2+
 */
+if ( ! class_exists( 'PW_CMB2_Field_Select2', false ) ) {
 
 /**
  * Class PW_CMB2_Field_Select2
@@ -182,3 +183,4 @@ class PW_CMB2_Field_Select2 {
 	}
 }
 $pw_cmb2_field_select2 = new PW_CMB2_Field_Select2();
+}
